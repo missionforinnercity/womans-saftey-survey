@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mission for Inner City Cape Town - Safety Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500&family=Oswald:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                dark: '#1a1025',     // Dark Purple (Kept for fallback)
+                darker: '#0d332b',   // Mission Dark Teal (Mixed in)
+                accent: '#7c3aed',   // Lighter Purple
+                danger: '#ff3366',   // Neon Red
+                warning: '#ff8533',  // Mission Orange
+                
+                // Mission Specific CI Colors
+                mission: {
+                    mint: '#6bd69e',
+                    teal: '#0d332b',
+                    pink: '#f7b8d6',
+                    offwhite: '#faf7f5',
+                    black: '#000000',
+                }
+              }
+            },
+            fontFamily: {
+              sans: ['Libre Franklin', 'sans-serif'], // Matches ITC Franklin Gothic Book
+              display: ['Oswald', 'sans-serif'],      // Matches ITC Franklin Gothic Compressed
+              serif: ['Playfair Display', 'serif'],   // Matches GT Alpina
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #966BBD; /* User requested Purple */
+        color: #faf7f5;
+        overflow-x: hidden;
+        margin: 0;
+      }
+
+      /* Liquid Background Container */
+      #liquid-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        overflow: hidden;
+        background: #966BBD; /* User requested Purple */
+      }
+
+      /* Animated Blobs */
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.5;
+        animation: float 20s infinite alternate ease-in-out;
+      }
+      .blob-1 {
+        top: -10%;
+        left: -10%;
+        width: 50vw;
+        height: 50vw;
+        background: #0d332b; /* Mission Teal */
+        animation-duration: 25s;
+      }
+      .blob-2 {
+        bottom: -10%;
+        right: -10%;
+        width: 60vw;
+        height: 60vw;
+        background: #1a0b2e; /* Deep Purple */
+        animation-duration: 30s;
+        animation-direction: alternate-reverse;
+      }
+      .blob-3 {
+        top: 30%;
+        left: 40%;
+        width: 40vw;
+        height: 40vw;
+        background: radial-gradient(circle, #6bd69e 0%, transparent 70%); /* Mission Mint */
+        opacity: 0.2;
+        animation-duration: 22s;
+      }
+      .blob-4 {
+        bottom: 20%;
+        left: 10%;
+        width: 30vw;
+        height: 30vw;
+        background: radial-gradient(circle, #f7b8d6 0%, transparent 70%); /* Mission Pink */
+        opacity: 0.15;
+        animation-duration: 28s;
+      }
+
+      @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0, 0) scale(1); }
+      }
+
+      /* Glassmorphism Utilities - Lighter & More Liquid */
+      .glass-panel {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.15));
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+      }
+      
+      .glass-card {
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Hide scrollbar for graphic container but allow scroll */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      /* Animation Keyframes */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes zoomIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      /* Heartbeat Animation for Alarming Stats */
+      @keyframes heartbeat {
+        0% { transform: scale(1); }
+        15% { transform: scale(1.05); }
+        30% { transform: scale(1); }
+        45% { transform: scale(1.05); }
+        60% { transform: scale(1); }
+        100% { transform: scale(1); }
+      }
+      .animate-heartbeat {
+        animation: heartbeat 2s ease-in-out infinite;
+      }
+
+      /* Animation Utility Classes */
+      .animate-fade-in {
+        opacity: 0;
+        animation: fadeIn 1s ease-out forwards;
+      }
+      .animate-slide-up {
+        opacity: 0;
+        animation: slideUp 0.8s ease-out forwards;
+      }
+      .animate-zoom-in {
+        opacity: 0;
+        animation: zoomIn 0.8s ease-out forwards;
+      }
+      .delay-300 { animation-delay: 300ms; }
+      .delay-500 { animation-delay: 500ms; }
+      .delay-700 { animation-delay: 700ms; }
+      .delay-1000 { animation-delay: 1000ms; }
+
+      /* Leaflet Customization */
+      .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+        background: #1e293b !important;
+        color: #f8fafc !important;
+        border: 1px solid #334155;
+      }
+      .leaflet-container {
+        background: #f8fafc !important;
+      }
+      
+      /* Mission Circumpunct Icon - White Ring with Inner Circle */
+      .mission-icon {
+        display: inline-block;
+        border-radius: 50%;
+        border: 4px solid #ffffff;
+        background-color: transparent;
+        box-sizing: border-box;
+        position: relative;
+      }
+      .mission-icon::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 55%;
+          height: 55%;
+          background-color: #ffffff;
+          border-radius: 50%;
+      }
+    </style>
+
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "leaflet": "https://esm.sh/leaflet@1.9.4",
+    "react-leaflet": "https://esm.sh/react-leaflet@4.2.1?external=react,react-dom,leaflet"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/womans-saftey-survey/assets/index-B6Tc0ZUl.js"></script>
+  <link rel="stylesheet" crossorigin href="/womans-saftey-survey/assets/index-tn0RQdqM.css">
+</head>
+  <body>
+    <!-- Liquid Background Elements -->
+    <div id="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+    </div>
+    <div id="root"></div>
+    <!-- Entry point for React app - Required for builds/dev servers -->
+</body>
+</html>
