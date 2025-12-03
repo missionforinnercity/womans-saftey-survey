@@ -3,7 +3,8 @@ import { ScrollyContainer } from './components/ScrollyContainer';
 import { StoryBlock } from './types';
 
 const App: React.FC = () => {
-
+  // Base-aware path so logo loads on GitHub Pages
+  const logoSrc = `${import.meta.env.BASE_URL}mission-logo.png`;
   const storyBlocks: StoryBlock[] = [
     {
       id: 'block-1',
@@ -161,7 +162,7 @@ const App: React.FC = () => {
         {/* Recreated Code Logo */}
         <div className="pointer-events-auto">
           <img
-            src="/mission-logo.png"
+            src={logoSrc}
             alt="Mission for Inner City Cape Town"
             className="w-32 md:w-40 drop-shadow-lg"
           />
@@ -184,7 +185,7 @@ const App: React.FC = () => {
       <footer className="w-full py-16 text-center text-slate-400 text-sm glass-panel border-t-0 relative mt-20">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-transparent">
              <img
-               src="/mission-logo.png"
+               src={logoSrc}
                alt="Mission for Inner City Cape Town"
                className="scale-75 origin-center w-32 md:w-40 opacity-50"
              />
