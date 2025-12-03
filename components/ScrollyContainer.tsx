@@ -99,7 +99,7 @@ export const ScrollyContainer: React.FC<ScrollyContainerProps> = ({ blocks }) =>
           >
             {/* Inline visual for mobile to avoid overlap */}
             <div className="md:hidden mb-6">
-              <div className="w-full h-[320px] rounded-2xl overflow-hidden glass-panel shadow-2xl">
+              <div className="w-full min-h-[420px] h-auto rounded-2xl overflow-hidden glass-panel shadow-2xl">
                 {renderVisual(block.visualType)}
               </div>
             </div>
