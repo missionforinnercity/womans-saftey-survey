@@ -1,20 +1,16 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Mission for Inner City: Cape Town — Safety Perception Survey (2025)
 
-# Run and deploy your AI Studio app
+This is a scrollytelling data viz that presents findings from a 2025 survey of women in Cape Town’s CBD about their perception of safety. It highlights harassment frequency, day/night perception shifts, danger/safe hotspots, and requested interventions.
 
-This contains everything you need to run your app locally.
+## Tech
+- Vite + React
+- Recharts (charts), React-Leaflet/Leaflet (map), Tailwind CDN for styling
 
-View your app in AI Studio: https://ai.studio/apps/drive/1jEm2Huvo_Pov13mvreOkUylnwdgKWxuK
+## Run locally
+1) Install deps: `npm install`
+2) Start dev server: `npm run dev`
+3) Open the URL shown in the console (default `http://localhost:5173` or the port you choose).
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Notes:
+- Map tiles load from CARTO, so you need network access.
+- Env file `.env.local` is not required for local dev of the static data shown here.
