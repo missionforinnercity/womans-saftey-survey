@@ -9,7 +9,7 @@ This is a scrollytelling data viz that presents findings from a 2025 survey of w
 ## Run locally
 1) Install deps: `npm install`
 2) Start dev server: `npm run dev`
-3) Open the URL shown in the console (default `http://localhost:5173` or the port you choose).
+3) Open the URL shown (https://missionforinnercity.github.io/womans-saftey-survey/).
 
 Notes:
 - Map tiles load from CARTO, so you need network access.
